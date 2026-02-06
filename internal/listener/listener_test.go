@@ -120,7 +120,9 @@ func TestPollingListener_Events(t *testing.T) {
 	}
 
 	cancel()
-	l.Stop()
+	if err := l.Stop(); err != nil {
+		t.Fatal(err)
+	}
 }
 
 func TestPollingListener_Stop(t *testing.T) {
@@ -147,7 +149,9 @@ func TestPollingListener_Confirmation(t *testing.T) {
 	l, _, f := newTestListener()
 	// ConfirmationDepth = 3
 
-	l.WatchAddress("0xaddr")
+	if err := l.WatchAddress("0xaddr"); err != nil {
+		t.Fatal(err)
+	}
 
 	// Block 1: has a matching tx
 	f.addBlock(&BlockData{
@@ -157,7 +161,9 @@ func TestPollingListener_Confirmation(t *testing.T) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	l.Start(ctx)
+	if err := l.Start(ctx); err != nil {
+		t.Fatal(err)
+	}
 
 	// First event: unconfirmed
 	select {
@@ -188,7 +194,9 @@ func TestPollingListener_Confirmation(t *testing.T) {
 	}
 
 	cancel()
-	l.Stop()
+	if err := l.Stop(); err != nil {
+		t.Fatal(err)
+	}
 }
 
 func TestPollingListener_Reorg(t *testing.T) {
@@ -197,7 +205,9 @@ func TestPollingListener_Reorg(t *testing.T) {
 	f := newMockFetcher()
 	l := NewPollingListener(models.NetworkETH, time.Hour, ws, f, PollingConfig{ConfirmationDepth: 3})
 
-	l.WatchAddress("0xaddr")
+	if err := l.WatchAddress("0xaddr"); err != nil {
+		t.Fatal(err)
+	}
 
 	// Block 1 with a tx
 	f.addBlock(&BlockData{
@@ -297,7 +307,9 @@ func TestManager_StartAllStopAll(t *testing.T) {
 	ws := storage.NewMemoryWatchStore()
 	f := newMockFetcher()
 	l := NewPollingListener(models.NetworkETH, 50*time.Millisecond, ws, f, PollingConfig{ConfirmationDepth: 3})
-	l.WatchAddress("0xaddr")
+	if err := l.WatchAddress("0xaddr"); err != nil {
+		t.Fatal(err)
+	}
 
 	// Add a block with tx so handler gets called
 	f.addBlock(&BlockData{

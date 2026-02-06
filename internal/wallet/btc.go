@@ -9,7 +9,7 @@ import (
 	"github.com/btcsuite/btcd/btcec/v2"
 	"github.com/btcsuite/btcd/btcutil/base58"
 	"github.com/olehkaliuzhnyi/wallet-demo/pkg/models"
-	"golang.org/x/crypto/ripemd160"
+	"golang.org/x/crypto/ripemd160" //nolint:staticcheck // RIPEMD-160 is required by the Bitcoin protocol (Hash160)
 )
 
 // BTCGenerator generates Bitcoin addresses using BIP-44 derivation.
@@ -18,10 +18,12 @@ import (
 // P2SH-P2WPKH (3...) and native SegWit bech32 (bc1...).
 type BTCGenerator struct{}
 
+// NewBTCGenerator returns a new Bitcoin address generator.
 func NewBTCGenerator() *BTCGenerator {
 	return &BTCGenerator{}
 }
 
+// Network returns the Bitcoin network identifier.
 func (g *BTCGenerator) Network() models.Network {
 	return models.NetworkBTC
 }
@@ -57,6 +59,7 @@ type BTCSigner struct {
 	networkPrefix byte // 0x00 mainnet, 0x6f testnet
 }
 
+// NewBTCSigner returns a new Bitcoin transaction signer for mainnet or testnet.
 func NewBTCSigner(mainnet bool) *BTCSigner {
 	prefix := byte(0x00)
 	if !mainnet {
@@ -65,6 +68,7 @@ func NewBTCSigner(mainnet bool) *BTCSigner {
 	return &BTCSigner{networkPrefix: prefix}
 }
 
+// Sign signs a Bitcoin transaction using double-SHA256 hashing.
 func (s *BTCSigner) Sign(ctx context.Context, tx *models.Transaction, privateKey []byte) (*models.Transaction, error) {
 	rawTx := buildRawBTCTx(tx)
 	txHash := doubleSHA256(rawTx)

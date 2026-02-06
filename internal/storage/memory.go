@@ -12,10 +12,12 @@ type MemoryNonceStore struct {
 	nonces map[string]uint64
 }
 
+// NewMemoryNonceStore returns a new in-memory NonceStore.
 func NewMemoryNonceStore() *MemoryNonceStore {
 	return &MemoryNonceStore{nonces: make(map[string]uint64)}
 }
 
+// GetAndIncrement atomically returns the current nonce and increments it.
 func (s *MemoryNonceStore) GetAndIncrement(address string) (uint64, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -30,16 +32,19 @@ type MemoryTxStore struct {
 	txs map[string]*models.Transaction
 }
 
+// NewMemoryTxStore returns a new in-memory TxStore.
 func NewMemoryTxStore() *MemoryTxStore {
 	return &MemoryTxStore{txs: make(map[string]*models.Transaction)}
 }
 
+// Get returns a transaction by idempotency key, or nil if not found.
 func (s *MemoryTxStore) Get(idempotencyKey string) (*models.Transaction, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	return s.txs[idempotencyKey], nil
 }
 
+// Put stores a transaction by idempotency key.
 func (s *MemoryTxStore) Put(idempotencyKey string, tx *models.Transaction) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -53,10 +58,12 @@ type MemoryWatchStore struct {
 	addrs map[string]bool
 }
 
+// NewMemoryWatchStore returns a new in-memory WatchStore.
 func NewMemoryWatchStore() *MemoryWatchStore {
 	return &MemoryWatchStore{addrs: make(map[string]bool)}
 }
 
+// Add registers an address for watching.
 func (s *MemoryWatchStore) Add(address string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -64,6 +71,7 @@ func (s *MemoryWatchStore) Add(address string) error {
 	return nil
 }
 
+// Remove unregisters an address from watching.
 func (s *MemoryWatchStore) Remove(address string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -71,6 +79,7 @@ func (s *MemoryWatchStore) Remove(address string) error {
 	return nil
 }
 
+// List returns all watched addresses.
 func (s *MemoryWatchStore) List() ([]string, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
@@ -81,6 +90,7 @@ func (s *MemoryWatchStore) List() ([]string, error) {
 	return result, nil
 }
 
+// Contains checks if an address is being watched.
 func (s *MemoryWatchStore) Contains(address string) (bool, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()

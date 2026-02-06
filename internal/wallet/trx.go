@@ -14,10 +14,12 @@ import (
 // TRON uses the same ECDSA secp256k1 as Ethereum but with Base58Check encoding.
 type TRXGenerator struct{}
 
+// NewTRXGenerator returns a new TRON address generator.
 func NewTRXGenerator() *TRXGenerator {
 	return &TRXGenerator{}
 }
 
+// Network returns the TRON network identifier.
 func (g *TRXGenerator) Network() models.Network {
 	return models.NetworkTRX
 }
@@ -55,10 +57,12 @@ func (g *TRXGenerator) GenerateFromSeed(seed []byte, index uint32) (*models.Deri
 // TRON uses protobuf for transaction serialization.
 type TRXSigner struct{}
 
+// NewTRXSigner returns a new TRON transaction signer.
 func NewTRXSigner() *TRXSigner {
 	return &TRXSigner{}
 }
 
+// Sign signs a TRON transaction using Keccak256 hashing.
 func (s *TRXSigner) Sign(ctx context.Context, tx *models.Transaction, privateKey []byte) (*models.Transaction, error) {
 	rawData := []byte(fmt.Sprintf("%s:%s:%s", tx.From, tx.To, tx.Amount.String()))
 	txHash := keccak256(rawData)

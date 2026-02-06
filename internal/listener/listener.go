@@ -85,6 +85,7 @@ type PollingListener struct {
 	done          chan struct{}
 }
 
+// NewPollingListener creates a new polling-based block listener for the given network.
 func NewPollingListener(network models.Network, pollInterval time.Duration, ws storage.WatchStore, fetcher BlockFetcher, cfg PollingConfig) *PollingListener {
 	if cfg.ConfirmationDepth == 0 {
 		cfg.ConfirmationDepth = 12
@@ -103,6 +104,7 @@ func NewPollingListener(network models.Network, pollInterval time.Duration, ws s
 	}
 }
 
+// Start begins polling for new blocks.
 func (l *PollingListener) Start(ctx context.Context) error {
 	ctx, l.cancel = context.WithCancel(ctx)
 
@@ -115,6 +117,7 @@ func (l *PollingListener) Start(ctx context.Context) error {
 	return nil
 }
 
+// Stop gracefully shuts down the polling loop and closes the events channel.
 func (l *PollingListener) Stop() error {
 	if l.cancel != nil {
 		l.cancel()
@@ -125,6 +128,7 @@ func (l *PollingListener) Stop() error {
 	return nil
 }
 
+// WatchAddress adds an address to the watch list.
 func (l *PollingListener) WatchAddress(address string) error {
 	if err := l.watchStore.Add(address); err != nil {
 		return err
@@ -133,6 +137,7 @@ func (l *PollingListener) WatchAddress(address string) error {
 	return nil
 }
 
+// UnwatchAddress removes an address from the watch list.
 func (l *PollingListener) UnwatchAddress(address string) error {
 	if err := l.watchStore.Remove(address); err != nil {
 		return err
@@ -141,6 +146,7 @@ func (l *PollingListener) UnwatchAddress(address string) error {
 	return nil
 }
 
+// Events returns the channel of detected block events.
 func (l *PollingListener) Events() <-chan models.BlockEvent {
 	return l.events
 }
@@ -313,6 +319,7 @@ type Manager struct {
 	logger    *slog.Logger
 }
 
+// NewManager creates a new multi-chain listener manager with the given event handler.
 func NewManager(handler EventHandler) *Manager {
 	return &Manager{
 		listeners: make(map[models.Network]BlockListener),
@@ -321,6 +328,7 @@ func NewManager(handler EventHandler) *Manager {
 	}
 }
 
+// RegisterListener adds a block listener for the specified network.
 func (m *Manager) RegisterListener(network models.Network, listener BlockListener) {
 	m.listeners[network] = listener
 }
@@ -350,6 +358,7 @@ func (m *Manager) StartAll(ctx context.Context) error {
 	return nil
 }
 
+// StopAll stops all registered listeners.
 func (m *Manager) StopAll() {
 	for network, listener := range m.listeners {
 		if err := listener.Stop(); err != nil {

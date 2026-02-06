@@ -5,6 +5,7 @@ import "math/big"
 // Network represents a blockchain network
 type Network string
 
+// Supported blockchain networks.
 const (
 	NetworkBTC Network = "BTC"
 	NetworkETH Network = "ETH"

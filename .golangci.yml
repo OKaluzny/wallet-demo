@@ -21,6 +21,8 @@ linters-settings:
   gosec:
     excludes:
       - G404 # weak random — we use crypto/rand where it matters
+      - G406 # RIPEMD160 — required by the Bitcoin protocol (Hash160)
+      - G507 # RIPEMD160 import — required by the Bitcoin protocol
 
 run:
   timeout: 3m

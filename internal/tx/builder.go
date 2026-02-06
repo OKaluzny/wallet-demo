@@ -28,6 +28,7 @@ type Builder struct {
 	cfg        BuilderConfig
 }
 
+// NewBuilder creates a new transaction builder with the given config and stores.
 func NewBuilder(cfg BuilderConfig, nonces storage.NonceStore, txs storage.TxStore) *Builder {
 	if cfg.MaxRetries <= 0 {
 		cfg.MaxRetries = 3
@@ -44,19 +45,20 @@ func NewBuilder(cfg BuilderConfig, nonces storage.NonceStore, txs storage.TxStor
 	}
 }
 
+// RegisterSigner registers a transaction signer for a specific network.
 func (b *Builder) RegisterSigner(network models.Network, signer wallet.Signer) {
 	b.signers[network] = signer
 }
 
 // SendRequest represents a request to send a transaction.
 type SendRequest struct {
-	IdempotencyKey string         // prevents duplicate sends
+	IdempotencyKey string // prevents duplicate sends
 	Network        models.Network
 	From           string
 	To             string
 	Amount         *big.Int
-	Data           []byte         // smart contract call data (ETH/TRX)
-	PrivateKey     []byte         // in production: replaced by HSM key reference
+	Data           []byte // smart contract call data (ETH/TRX)
+	PrivateKey     []byte // in production: replaced by HSM key reference
 }
 
 // Send builds, signs, and "broadcasts" a transaction with idempotency.

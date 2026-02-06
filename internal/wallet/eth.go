@@ -16,10 +16,12 @@ import (
 // Derivation path: m/44'/60'/0'/0/{index}
 type ETHGenerator struct{}
 
+// NewETHGenerator returns a new Ethereum address generator.
 func NewETHGenerator() *ETHGenerator {
 	return &ETHGenerator{}
 }
 
+// Network returns the Ethereum network identifier.
 func (g *ETHGenerator) Network() models.Network {
 	return models.NetworkETH
 }
@@ -56,10 +58,12 @@ type ETHSigner struct {
 	chainID *big.Int
 }
 
+// NewETHSigner returns a new Ethereum transaction signer with the given chain ID.
 func NewETHSigner(chainID int64) *ETHSigner {
 	return &ETHSigner{chainID: big.NewInt(chainID)}
 }
 
+// Sign signs an Ethereum transaction with EIP-155 replay protection.
 func (s *ETHSigner) Sign(ctx context.Context, tx *models.Transaction, privateKey []byte) (*models.Transaction, error) {
 	// Build RLP-encoded transaction (simplified)
 	// In production: use go-ethereum types.NewTransaction + types.SignTx
