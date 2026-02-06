@@ -1,5 +1,9 @@
 # Multi-Chain Wallet Demo
 
+[![CI](https://github.com/olehkaliuzhnyi/wallet-demo/actions/workflows/ci.yml/badge.svg)](https://github.com/olehkaliuzhnyi/wallet-demo/actions/workflows/ci.yml)
+[![Go](https://img.shields.io/badge/Go-1.21-00ADD8?logo=go&logoColor=white)](https://go.dev)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 Демонстраційний проєкт програмного крипто-гаманця з підтримкою кількох мереж.
 Реалізує ключові архітектурні патерни для генерації адрес, моніторингу блокчейну, підписання та надсилання транзакцій.
 
