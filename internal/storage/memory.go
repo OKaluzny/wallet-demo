@@ -3,7 +3,7 @@ package storage
 import (
 	"sync"
 
-	"github.com/olehkaliuzhnyi/wallet-demo/pkg/models"
+	"github.com/OKaluzny/wallet-demo/pkg/models"
 )
 
 // MemoryNonceStore is an in-memory NonceStore.

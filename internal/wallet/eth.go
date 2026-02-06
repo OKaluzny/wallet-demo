@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"math/big"
 
+	"github.com/OKaluzny/wallet-demo/pkg/models"
 	"github.com/btcsuite/btcd/btcec/v2"
-	"github.com/olehkaliuzhnyi/wallet-demo/pkg/models"
 	"github.com/tyler-smith/go-bip32"
 	"golang.org/x/crypto/sha3"
 )

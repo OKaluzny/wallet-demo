@@ -6,9 +6,9 @@ import (
 	"encoding/hex"
 	"fmt"
 
+	"github.com/OKaluzny/wallet-demo/pkg/models"
 	"github.com/btcsuite/btcd/btcec/v2"
 	"github.com/btcsuite/btcd/btcutil/base58"
-	"github.com/olehkaliuzhnyi/wallet-demo/pkg/models"
 	"golang.org/x/crypto/ripemd160" //nolint:staticcheck // RIPEMD-160 is required by the Bitcoin protocol (Hash160)
 )
 

@@ -5,8 +5,8 @@ import (
 	"encoding/hex"
 	"fmt"
 
+	"github.com/OKaluzny/wallet-demo/pkg/models"
 	"github.com/btcsuite/btcd/btcec/v2"
-	"github.com/olehkaliuzhnyi/wallet-demo/pkg/models"
 )
 
 // TRXGenerator generates TRON addresses using BIP-44 derivation.

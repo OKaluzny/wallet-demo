@@ -1,6 +1,6 @@
 package storage
 
-import "github.com/olehkaliuzhnyi/wallet-demo/pkg/models"
+import "github.com/OKaluzny/wallet-demo/pkg/models"
 
 // NonceStore manages per-address nonce state.
 type NonceStore interface {

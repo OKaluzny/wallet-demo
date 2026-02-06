@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/olehkaliuzhnyi/wallet-demo/internal/storage"
-	"github.com/olehkaliuzhnyi/wallet-demo/pkg/models"
+	"github.com/OKaluzny/wallet-demo/internal/storage"
+	"github.com/OKaluzny/wallet-demo/pkg/models"
 )
 
 // mockFetcher simulates a blockchain that produces blocks on demand.

@@ -1,4 +1,4 @@
-module github.com/olehkaliuzhnyi/wallet-demo
+module github.com/OKaluzny/wallet-demo
 
 go 1.21
 

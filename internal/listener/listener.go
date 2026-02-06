@@ -7,8 +7,8 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/olehkaliuzhnyi/wallet-demo/internal/storage"
-	"github.com/olehkaliuzhnyi/wallet-demo/pkg/models"
+	"github.com/OKaluzny/wallet-demo/internal/storage"
+	"github.com/OKaluzny/wallet-demo/pkg/models"
 )
 
 // BlockListener defines the interface for monitoring blockchain addresses.

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/olehkaliuzhnyi/wallet-demo/pkg/models"
+	"github.com/OKaluzny/wallet-demo/pkg/models"
 	"github.com/tyler-smith/go-bip39"
 )
 
