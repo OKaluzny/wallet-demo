@@ -1,0 +1,31 @@
+linters:
+  enable:
+    - errcheck
+    - govet
+    - staticcheck
+    - unused
+    - gosimple
+    - ineffassign
+    - typecheck
+    - gocritic
+    - revive
+    - gosec
+
+linters-settings:
+  govet:
+    shadow: true
+  revive:
+    rules:
+      - name: exported
+        severity: warning
+  gosec:
+    excludes:
+      - G404 # weak random — we use crypto/rand where it matters
+
+run:
+  timeout: 3m
+
+issues:
+  exclude-use-default: false
+  max-issues-per-linter: 0
+  max-same-issues: 0
