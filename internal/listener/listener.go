@@ -187,14 +187,22 @@ func (l *PollingListener) processBlock(ctx context.Context, number uint64) error
 		return fmt.Errorf("get block: %w", err)
 	}
 
-	// Reorg detection: check if parent hash matches what we stored
+	// Reorg detection: check if stored hash differs from what we just fetched
 	if prevHash, ok := l.blockHashes[number]; ok && prevHash != block.Hash {
 		l.logger.Warn("chain reorganization detected",
 			"block", number,
 			"old_hash", prevHash,
 			"new_hash", block.Hash,
 		)
-		l.handleReorg(ctx, number)
+		// Invalidate all pending events from this block onward.
+		// Use the highest block we have hashes for as upper bound.
+		var maxStored uint64
+		for bn := range l.blockHashes {
+			if bn > maxStored {
+				maxStored = bn
+			}
+		}
+		l.handleReorg(ctx, number, maxStored)
 	}
 
 	// Store this block's hash
@@ -248,10 +256,10 @@ func (l *PollingListener) processBlock(ctx context.Context, number uint64) error
 	return nil
 }
 
-// handleReorg emits Reorged=true events for all pending events at or after the reorg block,
+// handleReorg emits Reorged=true events for all pending events from reorgBlock to upTo,
 // then removes them from pendingEvents so re-processing can produce fresh events.
-func (l *PollingListener) handleReorg(ctx context.Context, reorgBlock uint64) {
-	for blockNum := reorgBlock; blockNum <= l.lastBlock; blockNum++ {
+func (l *PollingListener) handleReorg(ctx context.Context, reorgBlock uint64, upTo uint64) {
+	for blockNum := reorgBlock; blockNum <= upTo; blockNum++ {
 		events, ok := l.pendingEvents[blockNum]
 		if !ok {
 			continue

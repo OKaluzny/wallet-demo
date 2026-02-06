@@ -192,7 +192,10 @@ func TestPollingListener_Confirmation(t *testing.T) {
 }
 
 func TestPollingListener_Reorg(t *testing.T) {
-	l, _, f := newTestListener()
+	// Use manual poll calls instead of Start() to avoid races on lastBlock.
+	ws := storage.NewMemoryWatchStore()
+	f := newMockFetcher()
+	l := NewPollingListener(models.NetworkETH, time.Hour, ws, f, PollingConfig{ConfirmationDepth: 3})
 
 	l.WatchAddress("0xaddr")
 
@@ -202,32 +205,43 @@ func TestPollingListener_Reorg(t *testing.T) {
 		Txs: []BlockTx{{Hash: "tx1", From: "0xsender", To: "0xaddr", Amount: big.NewInt(100)}},
 	})
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	l.Start(ctx)
+	ctx := context.Background()
 
-	// Receive unconfirmed event
+	// Manually poll to process block 1
+	if err := l.poll(ctx); err != nil {
+		t.Fatal(err)
+	}
+
+	// Drain unconfirmed event
 	select {
 	case ev := <-l.Events():
 		if ev.Reorged {
 			t.Error("first event should not be reorged")
 		}
-	case <-time.After(2 * time.Second):
-		t.Fatal("timeout")
+		if ev.TxHash != "tx1" {
+			t.Errorf("expected tx1, got %s", ev.TxHash)
+		}
+	default:
+		t.Fatal("expected an event after poll")
 	}
 
-	// Simulate reorg: replace block 1 with different hash and different tx
+	// Simulate reorg: replace block 1 with different hash + add block 2 so head advances.
+	// The fetcher decrements head to force re-processing via a new block 2.
 	f.addBlock(&BlockData{
 		Number: 1, Hash: "h1-reorged",
 		Txs: []BlockTx{{Hash: "tx1-new", From: "0xsender", To: "0xaddr", Amount: big.NewInt(200)}},
 	})
-	// Reset lastBlock so listener re-processes block 1
+	// We need the listener to re-check block 1. Set lastBlock back to 0 (safe, no goroutine running).
 	l.lastBlock = 0
 
-	// We should get: 1) reorg event (Reorged=true for tx1), 2) new unconfirmed event for tx1-new
+	// Poll again — will re-fetch block 1, detect hash change, emit reorg + new event
+	if err := l.poll(ctx); err != nil {
+		t.Fatal(err)
+	}
+
+	// Collect events: expect reorg event for tx1 and new event for tx1-new
 	var gotReorg, gotNew bool
-	timeout := time.After(2 * time.Second)
-	for !gotReorg || !gotNew {
+	for i := 0; i < 10; i++ {
 		select {
 		case ev := <-l.Events():
 			if ev.Reorged && ev.TxHash == "tx1" {
@@ -236,13 +250,19 @@ func TestPollingListener_Reorg(t *testing.T) {
 			if !ev.Reorged && ev.TxHash == "tx1-new" {
 				gotNew = true
 			}
-		case <-timeout:
-			t.Fatalf("timeout: gotReorg=%v, gotNew=%v", gotReorg, gotNew)
+		default:
+		}
+		if gotReorg && gotNew {
+			break
 		}
 	}
 
-	cancel()
-	l.Stop()
+	if !gotReorg {
+		t.Error("expected reorg event for tx1")
+	}
+	if !gotNew {
+		t.Error("expected new event for tx1-new")
+	}
 }
 
 func TestManager_RegisterAndWatchAddress(t *testing.T) {
